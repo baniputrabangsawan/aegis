@@ -130,6 +130,20 @@ export async function getSecurityEventsMonitoring(actor: TenantActor, now = new 
   return { rows, stats: { open, critical, investigating, resolvedToday } };
 }
 
+export async function getBlockedIpsMonitoring(actor: TenantActor, now = new Date()) {
+  const prisma = getPrisma();
+  const tomorrow = startOfToday(new Date(now.getTime() + 24 * 60 * 60_000));
+  const where: Prisma.BlockedIPWhereInput = { organizationId: actor.organizationId };
+  const [rows, active, global, siteScoped, expiringToday] = await Promise.all([
+    prisma.blockedIP.findMany({ where, orderBy: { createdAt: "desc" }, take: 250, select: { id: true, ipAddress: true, scope: true, reason: true, status: true, createdAt: true, expiresAt: true, site: { select: { name: true } }, blockedBy: { select: { name: true, email: true } } } }),
+    prisma.blockedIP.count({ where: { ...where, status: "ACTIVE" } }),
+    prisma.blockedIP.count({ where: { ...where, scope: "GLOBAL", status: "ACTIVE" } }),
+    prisma.blockedIP.count({ where: { ...where, scope: "SITE", status: "ACTIVE" } }),
+    prisma.blockedIP.count({ where: { ...where, status: "ACTIVE", expiresAt: { gte: now, lt: tomorrow } } }),
+  ]);
+  return { rows, stats: { active, global, siteScoped, expiringToday } };
+}
+
 export async function getLiveMonitoring(actor: TenantActor, now = new Date()) {
   const prisma = getPrisma();
   const minuteAgo = new Date(now.getTime() - 60_000);
