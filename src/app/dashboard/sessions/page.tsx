@@ -28,6 +28,7 @@ export default async function SessionsPage() {
     data={rows}
     stats={[{ label: "Active", value: numbers.format(data.stats.active) }, { label: "Idle", value: numbers.format(data.stats.idle) }, { label: "Inactive", value: numbers.format(data.stats.inactive) }, { label: "Ended today", value: numbers.format(data.stats.endedToday) }]}
     searchPlaceholder="Search user, session, or device…"
+    emptyMessage="No sessions yet. Create a site, issue an API key, then send auth.login.success or session.created events."
     filterOptions={[...new Set(rows.map((row) => row.site))]}
     filterKey="site"
     columns={[{ key: "site", label: "Site", kind: "link", hrefKey: "detailHref" }, { key: "user", label: "User" }, { key: "sessionId", label: "External session", kind: "mono" }, { key: "device", label: "Device" }, { key: "started", label: "Started" }, { key: "lastActive", label: "Last active" }, { key: "status", label: "Status", kind: "status" }, { key: "risk", label: "Risk", kind: "risk" }]}

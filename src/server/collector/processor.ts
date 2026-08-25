@@ -42,25 +42,41 @@ function riskLevel(score: number): RiskLevel {
 }
 
 async function scoreEvent(transaction: Prisma.TransactionClient, event: NormalizedCollectorEvent, existingDeviceId?: string) {
-  const reasons: string[] = [];
+  const reasons = new Set<string>();
   let score = RISKY_EVENT_TYPES.has(event.eventType) ? 20 : 0;
   const since = new Date(event.occurredAt.getTime() - 15 * 60_000);
+  if (event.enrichment.ipAddress) {
+    const blockedIp = await transaction.blockedIP.findFirst({ where: { organizationId: event.organizationId, ipAddress: event.enrichment.ipAddress, status: "ACTIVE", OR: [{ siteId: null }, { siteId: event.siteId }], AND: [{ OR: [{ expiresAt: null }, { expiresAt: { gt: event.occurredAt } }] }] }, select: { id: true } });
+    if (blockedIp) { score += 60; reasons.add("blocked_ip: Blocked IP matched"); }
+  }
   if (event.eventType === "auth.login.failed") {
     const repeatedFailures = await transaction.loginAttempt.count({ where: { organizationId: event.organizationId, siteId: event.siteId, externalUserId: event.externalUserId, success: false, occurredAt: { gte: since } } });
-    if (repeatedFailures >= 5) { score += 40; reasons.push("Repeated failed login"); }
+    if (repeatedFailures >= 5) { score += 40; reasons.add("failed_login:user: Repeated failed login"); }
+    if (event.enrichment.ipAddress) {
+      const repeatedIpFailures = await transaction.loginAttempt.count({ where: { organizationId: event.organizationId, siteId: event.siteId, ipAddress: event.enrichment.ipAddress, success: false, occurredAt: { gte: since } } });
+      if (repeatedIpFailures >= 10) { score += 40; reasons.add("failed_login:ip: Repeated failed login from IP"); }
+    }
   }
-  if (!existingDeviceId && event.eventType === "auth.login.success") { score += 20; reasons.push("New device"); }
+  if (!existingDeviceId && event.eventType === "auth.login.success") { score += 20; reasons.add("new_device: New device"); }
   if (event.externalUserId && event.enrichment.geo.country) {
-    const knownCountry = await transaction.loginAttempt.findFirst({ where: { organizationId: event.organizationId, siteId: event.siteId, externalUserId: event.externalUserId, success: true, country: { not: null, notIn: [event.enrichment.geo.country] } }, select: { id: true } });
-    if (knownCountry) { score += 20; reasons.push("New country"); }
+    const previousCountry = await transaction.loginAttempt.findFirst({ where: { organizationId: event.organizationId, siteId: event.siteId, externalUserId: event.externalUserId, success: true, country: { not: null, notIn: [event.enrichment.geo.country] } }, orderBy: { occurredAt: "desc" }, select: { occurredAt: true } });
+    if (previousCountry) { score += 20; reasons.add("new_country: New country"); }
+    if (previousCountry && event.occurredAt.getTime() - previousCountry.occurredAt.getTime() < 2 * 60 * 60_000) { score += 50; reasons.add("impossible_travel: Country changed too quickly"); }
+  }
+  if (event.externalUserId && (event.enrichment.geo.asn || event.enrichment.geo.isp)) {
+    const changedNetwork: Prisma.SiteSessionWhereInput[] = [];
+    if (event.enrichment.geo.asn) changedNetwork.push({ asn: { not: null, notIn: [event.enrichment.geo.asn] } });
+    if (event.enrichment.geo.isp) changedNetwork.push({ isp: { not: null, notIn: [event.enrichment.geo.isp] } });
+    const knownNetwork = await transaction.siteSession.findFirst({ where: { organizationId: event.organizationId, siteId: event.siteId, externalUser: { externalUserId: event.externalUserId }, OR: changedNetwork }, select: { id: true } });
+    if (knownNetwork) { score += 15; reasons.add("network_change: ASN or ISP changed"); }
   }
   if (event.eventType === "session.refreshed" && event.externalSessionId) {
     const revoked = await transaction.siteSession.findUnique({ where: { siteId_externalSessionId: { siteId: event.siteId, externalSessionId: event.externalSessionId } }, select: { status: true } });
-    if (revoked?.status === "REVOKED") { score += 60; reasons.push("Revoked session reuse"); }
+    if (revoked?.status === "REVOKED") { score += 80; reasons.add("revoked_session_reuse: Revoked session reused"); }
   }
-  if (event.eventType.startsWith("security.")) reasons.push("Security signal reported");
+  if (event.eventType.startsWith("security.")) reasons.add("security_signal: Security signal reported");
   const cappedScore = Math.min(score, 100);
-  return { riskScore: cappedScore, riskLevel: riskLevel(cappedScore), riskReasons: reasons };
+  return { riskScore: cappedScore, riskLevel: riskLevel(cappedScore), riskReasons: [...reasons] };
 }
 
 async function upsertDevice(transaction: Prisma.TransactionClient, event: NormalizedCollectorEvent, externalUserRecordId: string) {

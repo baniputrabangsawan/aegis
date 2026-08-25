@@ -61,6 +61,7 @@ export const ModelName = {
   Site: 'Site',
   SiteApiCredential: 'SiteApiCredential',
   CollectorRateLimit: 'CollectorRateLimit',
+  GeoIPCache: 'GeoIPCache',
   ExternalUser: 'ExternalUser',
   SiteSession: 'SiteSession',
   Device: 'Device',
@@ -228,6 +229,23 @@ export const CollectorRateLimitScalarFieldEnum = {
 } as const
 
 export type CollectorRateLimitScalarFieldEnum = (typeof CollectorRateLimitScalarFieldEnum)[keyof typeof CollectorRateLimitScalarFieldEnum]
+
+
+export const GeoIPCacheScalarFieldEnum = {
+  ipAddress: 'ipAddress',
+  provider: 'provider',
+  country: 'country',
+  region: 'region',
+  city: 'city',
+  timezone: 'timezone',
+  asn: 'asn',
+  isp: 'isp',
+  lookedUpAt: 'lookedUpAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type GeoIPCacheScalarFieldEnum = (typeof GeoIPCacheScalarFieldEnum)[keyof typeof GeoIPCacheScalarFieldEnum]
 
 
 export const ExternalUserScalarFieldEnum = {

@@ -261,6 +261,23 @@ model CollectorRateLimit {
   @@map("collector_rate_limits")
 }
 
+model GeoIPCache {
+  ipAddress  String   @id
+  provider   String
+  country    String?
+  region     String?
+  city       String?
+  timezone   String?
+  asn        String?
+  isp        String?
+  lookedUpAt DateTime @default(now())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([lookedUpAt])
+  @@map("geoip_cache")
+}
+
 model ExternalUser {
   id             String             @id @default(cuid())
   organizationId String

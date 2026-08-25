@@ -2,7 +2,7 @@ import "server-only";
 import { authenticateCollector } from "@/server/collector/auth";
 import { consumeCollectorRateLimit } from "@/server/collector/rate-limit";
 import { collectorBatchSchema, collectorEventSchema } from "@/server/collector/schemas";
-import { createIPInfoGeoIPProvider, enrichCollectorRequest } from "@/server/collector/enrichment";
+import { createCachedGeoIPProvider, createIPInfoGeoIPProvider, enrichCollectorRequest } from "@/server/collector/enrichment";
 import { persistCollectorBatch, persistCollectorEvent } from "@/server/collector/service";
 import { getServerEnv } from "@/server/env";
 import { AppError, errorResponse } from "@/server/http/errors";
@@ -22,6 +22,7 @@ function assertCollectorRequest(request: Request, maxBytes: number) {
 }
 
 function collectorError(error: unknown, requestId: string) {
+  console.error(JSON.stringify({ level: "error", event: "collector_request_failed", requestId, errorName: error instanceof Error ? error.name : "UnknownError" }));
   const response = errorResponse(error, requestId);
   response.headers.set("X-Request-ID", requestId);
   if (response.status === 401) response.headers.set("WWW-Authenticate", "Bearer");
@@ -37,7 +38,8 @@ export async function handleSingleCollectorEvent(request: Request) {
     const rate = await consumeCollectorRateLimit(credential.id);
     const input = await parseJson(request, collectorEventSchema, maxBytes);
     const env = getServerEnv();
-    const data = await persistCollectorEvent(credential, input, await enrichCollectorRequest(request.headers, env.collectorTrustedProxies, createIPInfoGeoIPProvider(env.GEOIP_IPINFO_TOKEN), env.COLLECTOR_PROXY_SECRET));
+    const data = await persistCollectorEvent(credential, input, await enrichCollectorRequest(request.headers, env.collectorTrustedProxies, createCachedGeoIPProvider(createIPInfoGeoIPProvider(env.GEOIP_IPINFO_TOKEN), env.GEOIP_CACHE_TTL_HOURS), env.COLLECTOR_PROXY_SECRET));
+    console.info(JSON.stringify({ level: "info", event: "collector_event_accepted", requestId, siteId: credential.siteId, duplicate: data.duplicate }));
     return Response.json({ data, requestId }, { status: data.duplicate ? 200 : 202, headers: { ...responseHeaders, "X-Request-ID": requestId, "RateLimit-Limit": String(rate.limit), "RateLimit-Remaining": String(rate.remaining) } });
   } catch (error) {
     return collectorError(error, requestId);
@@ -54,7 +56,8 @@ export async function handleCollectorBatch(request: Request) {
     const input = await parseJson(request, collectorBatchSchema, maxBytes);
     if (input.events.length > 1) rate = await consumeCollectorRateLimit(credential.id, input.events.length - 1);
     const env = getServerEnv();
-    const data = await persistCollectorBatch(credential, input.events, await enrichCollectorRequest(request.headers, env.collectorTrustedProxies, createIPInfoGeoIPProvider(env.GEOIP_IPINFO_TOKEN), env.COLLECTOR_PROXY_SECRET));
+    const data = await persistCollectorBatch(credential, input.events, await enrichCollectorRequest(request.headers, env.collectorTrustedProxies, createCachedGeoIPProvider(createIPInfoGeoIPProvider(env.GEOIP_IPINFO_TOKEN), env.GEOIP_CACHE_TTL_HOURS), env.COLLECTOR_PROXY_SECRET));
+    console.info(JSON.stringify({ level: "info", event: "collector_batch_accepted", requestId, siteId: credential.siteId, received: data.received, accepted: data.accepted, duplicates: data.duplicates }));
     return Response.json({ data, requestId }, { status: 202, headers: { ...responseHeaders, "X-Request-ID": requestId, "RateLimit-Limit": String(rate.limit), "RateLimit-Remaining": String(rate.remaining) } });
   } catch (error) {
     return collectorError(error, requestId);
