@@ -1,0 +1,13 @@
+{
+	email {$ACME_EMAIL}
+	admin off
+}
+
+{$DASHBOARD_DOMAIN} {
+	encode zstd gzip
+	reverse_proxy app:3000
+	log {
+		output stdout
+		format json
+	}
+}

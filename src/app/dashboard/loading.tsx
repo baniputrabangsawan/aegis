@@ -1,0 +1,3 @@
+export default function Loading() {
+  return <div className="page" aria-busy="true" aria-label="Loading dashboard"><div style={{ width: 120, height: 11, background: "#e3e7e9", borderRadius: 4, marginBottom: 12 }} /><div style={{ width: 280, height: 28, background: "#e3e7e9", borderRadius: 5, marginBottom: 28 }} /><div className="metrics-grid">{Array.from({ length: 8 }, (_, index) => <div className="metric" key={index}><div style={{ width: "56%", height: 10, background: "#e6e9eb", borderRadius: 4 }} /><div style={{ width: "34%", height: 25, background: "#dfe4e6", borderRadius: 4, marginTop: 18 }} /></div>)}</div></div>;
+}

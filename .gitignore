@@ -1,0 +1,24 @@
+# dependencies
+node_modules/
+
+# Next.js output
+.next/
+out/
+
+# local environment
+.env*
+!.env.example
+!.env.development.example
+!.env.staging.example
+!.env.production.example
+
+# deployment runtime data
+backups/
+
+# TypeScript and tooling
+*.tsbuildinfo
+.eslintcache
+
+# OS/editor files
+.DS_Store
+*.swp

@@ -1,0 +1,5 @@
+import { Download } from "lucide-react";
+import { RecordsPage } from "@/components/records-page";
+import { securityEvents } from "@/lib/mock-data";
+
+export default function SecurityEventsPage() { return <RecordsPage eyebrow="Security" title="Security events" description="Prioritized detection signals with transparent risk reasons and investigation status." data={securityEvents} stats={[{ label: "Open", value: "17" }, { label: "Critical", value: "3" }, { label: "Investigating", value: "6" }, { label: "Resolved today", value: "24" }]} searchPlaceholder="Search events, users, or IPs…" actions={[{ label: "Export", icon: Download }]} columns={[{ key: "time", label: "Time", kind: "mono" }, { key: "site", label: "Site", kind: "primary" }, { key: "user", label: "User" }, { key: "event", label: "Event" }, { key: "ip", label: "IP", kind: "mono" }, { key: "risk", label: "Risk", kind: "risk" }, { key: "severity", label: "Severity", kind: "risk" }, { key: "status", label: "Status", kind: "status" }]} />; }

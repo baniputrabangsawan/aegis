@@ -1,0 +1,5 @@
+import { Download } from "lucide-react";
+import { RecordsPage } from "@/components/records-page";
+import { logins } from "@/lib/mock-data";
+
+export default function LoginActivityPage() { return <RecordsPage eyebrow="Monitoring" title="Login activity" description="Review authentication outcomes, methods, failure reasons, and risk context." data={logins} stats={[{ label: "Successful today", value: "8,492" }, { label: "Failed today", value: "214" }, { label: "Success rate", value: "97.5%" }, { label: "High risk", value: "41" }]} searchPlaceholder="Search login activity…" actions={[{ label: "Export", icon: Download }]} columns={[{ key: "time", label: "Time", kind: "mono" }, { key: "site", label: "Site", kind: "primary" }, { key: "user", label: "User" }, { key: "result", label: "Result", kind: "status" }, { key: "device", label: "Device" }, { key: "browser", label: "Browser" }, { key: "ip", label: "IP", kind: "mono" }, { key: "location", label: "Location" }, { key: "reason", label: "Reason" }, { key: "risk", label: "Risk", kind: "risk" }]} />; }

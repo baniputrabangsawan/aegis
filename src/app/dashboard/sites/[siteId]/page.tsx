@@ -1,0 +1,11 @@
+import { ExternalLink, Settings } from "lucide-react";
+import { notFound } from "next/navigation";
+import { DataTable } from "@/components/data-table";
+import { LoginChart } from "@/components/charts";
+import { PageHeader, Panel, StatStrip, StatusBadge } from "@/components/ui";
+import { securityEvents, sites } from "@/lib/mock-data";
+
+export default async function SiteDetailPage({ params }: { params: Promise<{ siteId: string }> }) {
+  const { siteId } = await params; const site = sites.find((item) => item.id === siteId) ?? sites[0]; if (!site) notFound();
+  return <div className="page"><PageHeader eyebrow="Site detail" title={site.name} description={`${site.domain} · ${site.environment}`} backHref="/dashboard/sites" actions={[{ label: "Open site", icon: ExternalLink }, { label: "Configure", icon: Settings, primary: true }]} /><StatStrip items={[{ label: "Users online", value: String(site.online) }, { label: "Active sessions", value: String(site.sessions) }, { label: "Logins today", value: site.logins.toLocaleString() }, { label: "Security alerts", value: String(site.alerts) }]} /><div className="detail-grid"><Panel title="Authentication volume" subtitle="Last 24 hours"><div className="panel-body"><LoginChart /></div></Panel><Panel title="Integration status" subtitle="Collector connection"><dl className="definition-list"><div className="definition"><dt>Status</dt><dd><StatusBadge>Connected</StatusBadge></dd></div><div className="definition"><dt>Last event</dt><dd>{site.lastEvent}</dd></div><div className="definition"><dt>Environment</dt><dd>{site.environment}</dd></div><div className="definition"><dt>SDK version</dt><dd className="mono">v0.8.4</dd></div><div className="definition"><dt>Site ID</dt><dd className="mono">site_aurora_7d31</dd></div><div className="definition"><dt>Mode</dt><dd>Monitor only</dd></div></dl></Panel></div><DataTable data={securityEvents.filter((event) => event.site === site.name)} searchPlaceholder="Search site events…" columns={[{ key: "time", label: "Time", kind: "mono" }, { key: "event", label: "Recent security event", kind: "primary" }, { key: "user", label: "User" }, { key: "ip", label: "IP", kind: "mono" }, { key: "risk", label: "Risk", kind: "risk" }, { key: "status", label: "Status", kind: "status" }]} /></div>;
+}

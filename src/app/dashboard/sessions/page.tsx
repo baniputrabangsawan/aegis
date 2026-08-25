@@ -1,0 +1,5 @@
+import { Download } from "lucide-react";
+import { RecordsPage } from "@/components/records-page";
+import { sessions } from "@/lib/mock-data";
+
+export default function SessionsPage() { return <RecordsPage eyebrow="Monitoring" title="Sessions" description="Inspect active and historical sessions across every connected website." data={sessions} stats={[{ label: "Active", value: "1,697" }, { label: "Idle", value: "342" }, { label: "Suspicious", value: "12" }, { label: "Revoked today", value: "28" }]} searchPlaceholder="Search user, device, or IP…" actions={[{ label: "Export", icon: Download }]} columns={[{ key: "site", label: "Site", kind: "primary" }, { key: "user", label: "User" }, { key: "device", label: "Device" }, { key: "os", label: "OS" }, { key: "browser", label: "Browser" }, { key: "ip", label: "IP", kind: "mono" }, { key: "location", label: "Location" }, { key: "login", label: "Login" }, { key: "lastActive", label: "Last active" }, { key: "status", label: "Status", kind: "status" }]} />; }
