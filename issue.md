@@ -1,161 +1,166 @@
-# Issue: Production Readiness untuk Real-Time Security Dashboard
+# Issue: Pindahkan Audit Logs dari Mock Data ke Database
 
 ## Ringkasan
 
-Dashboard sudah menerima telemetry asli dari Collector API dan menampilkan data database untuk Dashboard, Live Activity, Devices, Sessions, Login Activity, Users, dan Security Events. Namun masih ada beberapa pekerjaan agar sistem benar-benar production-ready, real-time, hemat biaya, mudah diintegrasikan, dan lebih kuat dalam deteksi risiko.
+Halaman `/dashboard/audit-logs` masih menggunakan `auditLogs` dari `src/lib/mock-data.ts`. Ini membuat angka statistik dan tabel audit tidak merefleksikan aktivitas administratif yang benar-benar tersimpan di database.
 
 ## Kondisi Saat Ini
 
-- Collector menerima single event dan batch event.
-- Collector memvalidasi API key, ukuran body, rate limit, dan schema event.
-- Device enrichment sudah membaca `User-Agent` menjadi browser, OS, dan device type.
-- IP resolution sudah aman: forwarding headers diabaikan kecuali request melewati trusted proxy dan proxy secret valid.
-- GeoIP enrichment sudah tersedia via IPinfo jika `GEOIP_IPINFO_TOKEN` diisi.
-- Risk scoring awal sudah ada untuk repeated failed login, new device, new country, revoked session reuse, dan security signals.
-- Halaman utama dashboard sudah membaca data asli dari database, bukan mock.
+- File `src/app/dashboard/audit-logs/page.tsx` masih import `auditLogs` dari `@/lib/mock-data`.
+- Statistik masih hardcoded:
+  - `Events today: 142`
+  - `Admin actions: 38`
+  - `Security actions: 51`
+  - `Policy changes: 4`
+- Tabel audit masih memakai data dummy.
+- Model Prisma `AuditLog` sudah tersedia di `prisma/schema.prisma`.
+- Permission `audit_log:read` sudah tersedia di permission matrix.
 
 ## Tujuan
 
-Membuat real-time security dashboard siap digunakan secara end-to-end di production dengan live updates, onboarding yang jelas, cache GeoIP, helper integrasi, risk engine lebih kuat, dan operasional yang aman.
+Mengubah halaman Audit Logs agar membaca data asli dari tabel `AuditLog` dengan isolasi tenant berdasarkan `organizationId`, bukan mock data.
 
-## Prioritas 1: Live Activity Benar-Benar Real-Time
+## Scope Implementasi
 
-### Masalah
+### 1. Query Monitoring Audit Logs
 
-Halaman `/dashboard/live` saat ini membaca data asli dari database, tetapi belum auto-refresh. User masih perlu refresh halaman untuk melihat event terbaru.
+Tambahkan query baru di `src/server/monitoring/queries.ts`, misalnya `getAuditLogsMonitoring(actor, now)`.
 
-### Rencana
+Query harus mengambil:
 
-- Tambahkan internal API route untuk recent security events dan live stats.
-- Tambahkan polling client setiap 3-5 detik.
-- Tombol Pause tetap menghentikan refresh UI lokal saja.
-- Pastikan setiap request tetap melewati authorization tenant.
+- Audit log terbaru, maksimal 250 row.
+- Actor admin jika tersedia.
+- Site jika audit log terkait site.
+- Action.
+- Target type.
+- Target ID.
+- Actor IP.
+- Metadata ringkas.
+- Created time.
 
-### Acceptance Criteria
+Query harus menghitung statistik:
 
-- Event baru muncul di `/dashboard/live` dalam maksimal 5 detik.
-- Pause menghentikan update UI, bukan collector.
-- Resume langsung mengambil data terbaru.
-- Halaman punya empty state jika belum ada telemetry.
+- Events today.
+- Admin actions.
+- Security actions.
+- Policy changes.
 
-## Prioritas 2: Empty-State Onboarding
+## Suggested Classification
 
-### Masalah
+### Admin actions
 
-Saat belum ada data, beberapa halaman terlihat kosong dan tidak menjelaskan langkah berikutnya.
+Action yang berkaitan dengan organisasi, member, invite, site, API key, settings, atau admin session.
 
-### Rencana
+Contoh prefix/kata kunci:
 
-- Tambahkan empty state untuk Dashboard, Live Activity, Devices, Sessions, Login Activity, dan Security Events.
-- Empty state mengarahkan user ke Sites, API Keys, dan Docs.
-- Tampilkan contoh payload collector minimal.
+- `organization.`
+- `member.`
+- `invitation.`
+- `site.`
+- `api_key.`
+- `settings.`
+- `admin.`
 
-### Acceptance Criteria
+### Security actions
 
-- User baru tahu harus membuat site, membuat API key, dan mengirim event pertama.
-- Halaman kosong tidak terlihat seperti error.
+Action yang berkaitan dengan security event, session revoke, blocked IP, investigation, atau enforcement.
 
-## Prioritas 3: GeoIP Cache
+Contoh prefix/kata kunci:
 
-### Masalah
+- `security.`
+- `security_event.`
+- `blocked_ip.`
+- `session.revoke`
+- `investigation.`
+  
+### Policy changes
 
-Setiap lookup IP bisa memanggil IPinfo. Ini menambah latency dan biaya jika traffic tinggi.
+Action yang mengubah policy, mode enforcement, blocklist, credential, atau settings.
 
-### Rencana
+Contoh prefix/kata kunci:
 
-- Tambahkan tabel `GeoIPCache` keyed by IP address.
-- Simpan country, region, city, timezone, ASN, ISP, provider, dan lookup timestamp.
-- Cek cache sebelum memanggil IPinfo.
-- Refresh data jika sudah melewati TTL konfigurasi.
-- Tetap menerima event jika lookup gagal.
+- `policy.`
+- `settings.`
+- `blocked_ip.`
+- `api_key.`
+- action yang mengandung `update`, `create`, `delete`, `revoke`, atau `rotate`.
 
-### Acceptance Criteria
+## 2. Update Halaman Audit Logs
 
-- IP yang sama tidak selalu memanggil IPinfo.
-- Collector tetap menerima event ketika GeoIP provider gagal.
-- Cache tidak menyimpan data identitas user.
+Ubah `src/app/dashboard/audit-logs/page.tsx` agar:
 
-## Prioritas 4: Integration Helper / SDK Sederhana
+- Menjadi server component async.
+- Memanggil `requirePermission("audit_log:read")`.
+- Memakai `getAuditLogsMonitoring(actor)`.
+- Menghapus import dari `@/lib/mock-data`.
+- Menampilkan row database ke `RecordsPage`.
 
-### Masalah
+Kolom yang disarankan:
 
-Integrasi saat ini masih berupa raw HTTP request. Ini rawan payload tidak konsisten dan secret key bisa salah dipakai.
+- `Time`
+- `Actor`
+- `Action`
+- `Target`
+- `Site`
+- `Actor IP`
+- `Details`
 
-### Rencana
+## 3. Empty State
 
-- Tambahkan helper server-side untuk aplikasi yang dipantau.
-- Sediakan fungsi:
-  - `trackLoginSuccess`
-  - `trackLoginFailed`
-  - `trackSessionCreated`
-  - `trackSessionRefreshed`
-  - `trackLogout`
-  - `trackSessionRevoked`
-- Helper menerima atau membuat stable event ID.
-- Helper meneruskan `User-Agent` asli dari request aplikasi.
-- Secret key hanya dipakai di backend.
+Tambahkan empty state untuk kondisi belum ada audit log.
 
-### Acceptance Criteria
+Contoh copy:
 
-- Aplikasi Next.js/backend bisa mengirim telemetry tanpa menulis payload manual.
-- Secret collector tidak pernah masuk browser.
-- Helper tidak memblokir flow auth utama jika Collector lambat/gagal.
+`No audit logs yet. Administrative and security-sensitive actions will appear here after users manage sites, API keys, sessions, or blocked IPs.`
 
-## Prioritas 5: Risk Engine Lanjutan
+## 4. Data Formatting
 
-### Masalah
+Format row yang disarankan:
 
-Risk engine masih versi awal. Deteksi sudah ada, tetapi belum cukup untuk pola serangan dan anomali yang lebih kuat.
+- `actor`: `actor.name`, fallback ke `actor.email`, fallback ke `System`.
+- `target`: gabungan `targetType` dan `targetId` jika ada.
+- `site`: nama site jika tersedia, fallback `Organization`.
+- `ip`: `actorIp`, fallback `Unknown`.
+- `detail`: ringkasan metadata yang aman dan pendek.
 
-### Rencana
+Metadata tidak boleh ditampilkan mentah jika terlalu panjang. Batasi detail agar tabel tetap mudah dibaca.
 
-- Tambahkan impossible travel berdasarkan negara login sebelumnya dan waktu login.
-- Agregasi failed login berdasarkan user, IP, dan site.
-- Cek `BlockedIP` saat event masuk.
-- Deteksi perubahan ASN/ISP untuk known user.
-- Eskalasi revoked session reuse.
-- Tambahkan rule ID stabil dan dedup risk reasons.
+## 5. Audit Log Producer yang Perlu Dicek
 
-### Acceptance Criteria
+Setelah halaman membaca database, pastikan action penting benar-benar menulis ke tabel `AuditLog`.
 
-- Risk reasons menjelaskan kenapa event menjadi Medium, High, atau Critical.
-- Repeated failed login tidak membuat noise berlebihan.
-- Hit dari blocked IP tampil jelas di Security Events.
-- Rules punya unit test terfokus.
+Minimal action yang perlu diaudit:
 
-## Prioritas 6: Production Hardening
+- Site created.
+- Site updated.
+- Site deleted/disabled.
+- API key created.
+- API key rotated.
+- API key revoked.
+- Blocked IP created.
+- Blocked IP revoked/deleted.
+- Session revoked.
+- Security event status updated.
+- Settings updated.
 
-### Masalah
+Jika producer belum ada, buat issue lanjutan atau implementasi kecil untuk action yang sudah memiliki server mutation.
 
-Operasional production butuh observability, healthcheck, dan prosedur recovery yang lebih jelas.
+## Acceptance Criteria
 
-### Rencana
-
-- Tambahkan structured logs untuk collector tanpa secret dan tanpa data pribadi berlebihan.
-- Catat error rate collector dan event rate limit.
-- Tambahkan healthcheck database yang lebih detail.
-- Dokumentasikan backup restore drill.
-- Tambahkan deployment checklist untuk proxy headers, proxy secret, dan GeoIP token.
-
-### Acceptance Criteria
-
-- Operator bisa mendiagnosis collector failure dari log.
-- Secret tidak pernah masuk log.
-- Health endpoint mendeteksi database connectivity failure.
-- Restore procedure terdokumentasi dan bisa dites.
-
-## Urutan Implementasi yang Disarankan
-
-1. Live Activity polling.
-2. Empty-state onboarding.
-3. GeoIP cache.
-4. Integration helper.
-5. Risk engine lanjutan.
-6. Production hardening.
+- `/dashboard/audit-logs` tidak lagi import `@/lib/mock-data`.
+- Semua data audit log difilter berdasarkan `actor.organizationId`.
+- Statistik berasal dari database.
+- Tabel menampilkan audit log terbaru dari database.
+- Empty state muncul saat belum ada data.
+- Tidak ada secret/token yang ditampilkan dari metadata.
+- `pnpm typecheck` lolos.
+- `pnpm test` lolos jika ada test terkait.
+- `pnpm lint` lolos.
 
 ## Test Plan
 
-- Unit test untuk IP resolution, trusted proxy, GeoIP cache, dan risk rules.
-- Route test untuk authorization dan response shape internal live API.
-- Manual collector test untuk login success, login failed, session refresh, logout, revoked, expired, dan security signal.
-- Manual dashboard test untuk Dashboard, Live Activity, Devices, Sessions, Login Activity, Users, dan Security Events.
+- Unit/integration query test jika pola test database sudah tersedia.
+- Manual test dengan membuat site atau API key, lalu cek audit log muncul.
+- Manual test tenant isolation: audit log organisasi lain tidak muncul.
+- Manual test empty state di organisasi tanpa audit log.
+- Manual test metadata panjang tidak merusak tampilan tabel.
