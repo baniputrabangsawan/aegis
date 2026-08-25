@@ -3,6 +3,7 @@ import { timingSafeEqual } from "node:crypto";
 import { isIP } from "node:net";
 import { UAParser } from "ua-parser-js";
 import type { SafeJson } from "@/server/collector/schemas";
+import { getPrisma } from "@/server/db/client";
 
 export type GeoIPData = { country?: string; region?: string; city?: string; timezone?: string; asn?: string; isp?: string };
 export type GeoIPProvider = { lookup(ipAddress: string, signal?: AbortSignal): Promise<GeoIPData | undefined> };
@@ -129,6 +130,22 @@ export function createIPInfoGeoIPProvider(token: string | undefined): GeoIPProvi
         timezone: stringField(body.timezone, 120),
         ...parseOrg(stringField(body.org, 200)),
       };
+    },
+  };
+}
+
+export function createCachedGeoIPProvider(provider: GeoIPProvider, ttlHours: number): GeoIPProvider {
+  return {
+    async lookup(ipAddress, signal) {
+      if (!isIP(ipAddress)) return undefined;
+      const prisma = getPrisma();
+      const staleBefore = new Date(Date.now() - ttlHours * 60 * 60_000);
+      const cached = await prisma.geoIPCache.findUnique({ where: { ipAddress } });
+      if (cached && cached.lookedUpAt > staleBefore) return { country: cached.country ?? undefined, region: cached.region ?? undefined, city: cached.city ?? undefined, timezone: cached.timezone ?? undefined, asn: cached.asn ?? undefined, isp: cached.isp ?? undefined };
+      const fresh = await provider.lookup(ipAddress, signal);
+      if (!fresh) return cached ? { country: cached.country ?? undefined, region: cached.region ?? undefined, city: cached.city ?? undefined, timezone: cached.timezone ?? undefined, asn: cached.asn ?? undefined, isp: cached.isp ?? undefined } : undefined;
+      await prisma.geoIPCache.upsert({ where: { ipAddress }, create: { ipAddress, provider: "ipinfo", ...fresh, lookedUpAt: new Date() }, update: { provider: "ipinfo", ...fresh, lookedUpAt: new Date() } });
+      return fresh;
     },
   };
 }

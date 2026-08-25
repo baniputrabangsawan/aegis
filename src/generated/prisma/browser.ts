@@ -68,6 +68,11 @@ export type SiteApiCredential = Prisma.SiteApiCredentialModel
  */
 export type CollectorRateLimit = Prisma.CollectorRateLimitModel
 /**
+ * Model GeoIPCache
+ * 
+ */
+export type GeoIPCache = Prisma.GeoIPCacheModel
+/**
  * Model ExternalUser
  * 
  */

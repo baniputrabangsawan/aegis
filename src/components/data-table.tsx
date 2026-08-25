@@ -25,8 +25,8 @@ function CellValue({ value, row, column }: { value: DataValue; row: TableRow; co
   return <>{value}</>;
 }
 
-export function DataTable({ data, columns, searchPlaceholder = "Search records…", filterLabel = "All sites", filterOptions = [], filterKey }: {
-  data: TableRow[]; columns: ColumnSpec[]; searchPlaceholder?: string; filterLabel?: string; filterOptions?: string[]; filterKey?: string;
+export function DataTable({ data, columns, searchPlaceholder = "Search records…", filterLabel = "All sites", filterOptions = [], filterKey, emptyMessage = "No records found." }: {
+  data: TableRow[]; columns: ColumnSpec[]; searchPlaceholder?: string; filterLabel?: string; filterOptions?: string[]; filterKey?: string; emptyMessage?: string;
 }) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
@@ -54,10 +54,10 @@ export function DataTable({ data, columns, searchPlaceholder = "Search records�
     <div className="table-scroll">
       <table className="data-table">
         <thead>{table.getHeaderGroups().map((group) => <tr key={group.id}>{group.headers.map((header) => <th key={header.id}><button onClick={header.column.getToggleSortingHandler()}>{flexRender(header.column.columnDef.header, header.getContext())}<ChevronsUpDown size={11} /></button></th>)}</tr>)}</thead>
-        <tbody>{rows.length === 0 ? <tr><td colSpan={tableColumns.length} className="table-empty">No records found.</td></tr> : visibleRows.map((row) => <tr key={row.id}>{row.getVisibleCells().map((cell) => <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>)}</tr>)}</tbody>
+        <tbody>{rows.length === 0 ? <tr><td colSpan={tableColumns.length} className="table-empty">{emptyMessage}</td></tr> : visibleRows.map((row) => <tr key={row.id}>{row.getVisibleCells().map((cell) => <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>)}</tr>)}</tbody>
       </table>
     </div>
-    <div className="mobile-list">{rows.length === 0 && <div className="mobile-card table-empty">No records found.</div>}{visibleRows.map((row) => {
+    <div className="mobile-list">{rows.length === 0 && <div className="mobile-card table-empty">{emptyMessage}</div>}{visibleRows.map((row) => {
       const primary = columns.find((column) => column.kind === "primary" || column.kind === "site" || column.kind === "link") ?? columns[0];
       const status = columns.find((column) => column.kind === "status" || column.kind === "risk");
       const details = columns.filter((column) => column.key !== primary.key && column.key !== status?.key && column.key !== "domain").slice(0, 4);

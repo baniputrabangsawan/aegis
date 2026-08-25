@@ -25,6 +25,7 @@ export default async function LoginActivityPage() {
     data={rows}
     stats={[{ label: "Successful today", value: numbers.format(data.stats.successful) }, { label: "Failed today", value: numbers.format(data.stats.failed) }, { label: "Success rate", value: `${(data.stats.successRate * 100).toFixed(1)}%` }, { label: "High risk", value: numbers.format(data.stats.highRisk) }]}
     searchPlaceholder="Search login activity…"
+    emptyMessage="No login activity yet. Send auth.login.success or auth.login.failed events from your backend collector integration."
     filterOptions={[...new Set(rows.map((row) => row.site))]}
     filterKey="site"
     columns={[{ key: "time", label: "Time", kind: "mono" }, { key: "site", label: "Site", kind: "primary" }, { key: "user", label: "User" }, { key: "result", label: "Result", kind: "status" }, { key: "device", label: "Device" }, { key: "reason", label: "Reason" }, { key: "risk", label: "Risk", kind: "risk" }]}

@@ -407,6 +407,7 @@ export const ModelName = {
   Site: 'Site',
   SiteApiCredential: 'SiteApiCredential',
   CollectorRateLimit: 'CollectorRateLimit',
+  GeoIPCache: 'GeoIPCache',
   ExternalUser: 'ExternalUser',
   SiteSession: 'SiteSession',
   Device: 'Device',
@@ -429,7 +430,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "account" | "verification" | "organization" | "member" | "invitation" | "site" | "siteApiCredential" | "collectorRateLimit" | "externalUser" | "siteSession" | "device" | "loginAttempt" | "securityEvent" | "blockedIP" | "auditLog"
+    modelProps: "user" | "session" | "account" | "verification" | "organization" | "member" | "invitation" | "site" | "siteApiCredential" | "collectorRateLimit" | "geoIPCache" | "externalUser" | "siteSession" | "device" | "loginAttempt" | "securityEvent" | "blockedIP" | "auditLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1173,6 +1174,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    GeoIPCache: {
+      payload: Prisma.$GeoIPCachePayload<ExtArgs>
+      fields: Prisma.GeoIPCacheFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.GeoIPCacheFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GeoIPCachePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.GeoIPCacheFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GeoIPCachePayload>
+        }
+        findFirst: {
+          args: Prisma.GeoIPCacheFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GeoIPCachePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.GeoIPCacheFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GeoIPCachePayload>
+        }
+        findMany: {
+          args: Prisma.GeoIPCacheFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GeoIPCachePayload>[]
+        }
+        create: {
+          args: Prisma.GeoIPCacheCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GeoIPCachePayload>
+        }
+        createMany: {
+          args: Prisma.GeoIPCacheCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.GeoIPCacheCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GeoIPCachePayload>[]
+        }
+        delete: {
+          args: Prisma.GeoIPCacheDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GeoIPCachePayload>
+        }
+        update: {
+          args: Prisma.GeoIPCacheUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GeoIPCachePayload>
+        }
+        deleteMany: {
+          args: Prisma.GeoIPCacheDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.GeoIPCacheUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.GeoIPCacheUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GeoIPCachePayload>[]
+        }
+        upsert: {
+          args: Prisma.GeoIPCacheUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GeoIPCachePayload>
+        }
+        aggregate: {
+          args: Prisma.GeoIPCacheAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateGeoIPCache>
+        }
+        groupBy: {
+          args: Prisma.GeoIPCacheGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GeoIPCacheGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.GeoIPCacheCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GeoIPCacheCountAggregateOutputType> | number
+        }
+      }
+    }
     ExternalUser: {
       payload: Prisma.$ExternalUserPayload<ExtArgs>
       fields: Prisma.ExternalUserFieldRefs
@@ -1874,6 +1949,23 @@ export const CollectorRateLimitScalarFieldEnum = {
 export type CollectorRateLimitScalarFieldEnum = (typeof CollectorRateLimitScalarFieldEnum)[keyof typeof CollectorRateLimitScalarFieldEnum]
 
 
+export const GeoIPCacheScalarFieldEnum = {
+  ipAddress: 'ipAddress',
+  provider: 'provider',
+  country: 'country',
+  region: 'region',
+  city: 'city',
+  timezone: 'timezone',
+  asn: 'asn',
+  isp: 'isp',
+  lookedUpAt: 'lookedUpAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type GeoIPCacheScalarFieldEnum = (typeof GeoIPCacheScalarFieldEnum)[keyof typeof GeoIPCacheScalarFieldEnum]
+
+
 export const ExternalUserScalarFieldEnum = {
   id: 'id',
   organizationId: 'organizationId',
@@ -2456,6 +2548,7 @@ export type GlobalOmitConfig = {
   site?: Prisma.SiteOmit
   siteApiCredential?: Prisma.SiteApiCredentialOmit
   collectorRateLimit?: Prisma.CollectorRateLimitOmit
+  geoIPCache?: Prisma.GeoIPCacheOmit
   externalUser?: Prisma.ExternalUserOmit
   siteSession?: Prisma.SiteSessionOmit
   device?: Prisma.DeviceOmit

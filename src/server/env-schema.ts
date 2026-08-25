@@ -17,6 +17,7 @@ export const serverEnvSchema = z.object({
   COLLECTOR_TRUSTED_PROXIES: z.string().default(""),
   COLLECTOR_PROXY_SECRET: z.string().optional(),
   GEOIP_IPINFO_TOKEN: z.string().optional(),
+  GEOIP_CACHE_TTL_HOURS: z.coerce.number().int().min(1).max(24 * 30).default(168),
 }).superRefine((env, context) => {
   if (env.NODE_ENV !== "production") return;
   if (!env.BETTER_AUTH_URL.startsWith("https://")) {

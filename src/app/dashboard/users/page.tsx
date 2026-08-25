@@ -28,6 +28,7 @@ export default async function UsersPage() {
     data={rows}
     stats={[{ label: "Total users", value: numbers.format(data.stats.total) }, { label: "Online now", value: numbers.format(data.stats.online) }, { label: "New today", value: numbers.format(data.stats.newToday) }, { label: "Elevated risk", value: numbers.format(data.stats.elevatedRisk) }]}
     searchPlaceholder="Search external ID, name, or email…"
+    emptyMessage="No users yet. Successful login events with externalUserId will create external identities automatically."
     filterOptions={[...new Set(rows.map((row) => row.site))]}
     filterKey="site"
     columns={[{ key: "user", label: "User", kind: "primary" }, { key: "identity", label: "External ID / Email" }, { key: "site", label: "Site" }, { key: "sessions", label: "Sessions", kind: "number" }, { key: "devices", label: "Devices", kind: "number" }, { key: "firstSeen", label: "First seen" }, { key: "lastSeen", label: "Last seen" }, { key: "status", label: "Status", kind: "status" }, { key: "risk", label: "Risk", kind: "risk" }]}
