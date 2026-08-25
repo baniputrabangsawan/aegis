@@ -1,5 +1,32 @@
-import { Download } from "lucide-react";
 import { RecordsPage } from "@/components/records-page";
-import { logins } from "@/lib/mock-data";
+import { requirePermission } from "@/server/auth/guards";
+import { getLoginActivityMonitoring } from "@/server/monitoring/queries";
 
-export default function LoginActivityPage() { return <RecordsPage eyebrow="Monitoring" title="Login activity" description="Review authentication outcomes, methods, failure reasons, and risk context." data={logins} stats={[{ label: "Successful today", value: "8,492" }, { label: "Failed today", value: "214" }, { label: "Success rate", value: "97.5%" }, { label: "High risk", value: "41" }]} searchPlaceholder="Search login activity…" actions={[{ label: "Export", icon: Download }]} columns={[{ key: "time", label: "Time", kind: "mono" }, { key: "site", label: "Site", kind: "primary" }, { key: "user", label: "User" }, { key: "result", label: "Result", kind: "status" }, { key: "device", label: "Device" }, { key: "browser", label: "Browser" }, { key: "ip", label: "IP", kind: "mono" }, { key: "location", label: "Location" }, { key: "reason", label: "Reason" }, { key: "risk", label: "Risk", kind: "risk" }]} />; }
+const numbers = new Intl.NumberFormat("en");
+const dates = new Intl.DateTimeFormat("en", { dateStyle: "medium", timeStyle: "medium" });
+function label(value: string) { return value.toLowerCase().split("_").map((word) => word[0].toUpperCase() + word.slice(1)).join(" "); }
+
+export default async function LoginActivityPage() {
+  const actor = await requirePermission("security_event:read");
+  const data = await getLoginActivityMonitoring(actor);
+  const rows = data.rows.map((attempt) => ({
+    time: dates.format(attempt.occurredAt),
+    site: attempt.site.name,
+    user: attempt.externalUser?.displayName ?? attempt.externalUser?.email ?? attempt.externalUserId ?? "Unknown user",
+    result: attempt.success ? "Success" : "Failed",
+    device: attempt.device?.friendlyName ?? "Not reported",
+    reason: attempt.success ? "Accepted" : attempt.failureReason ?? "Unspecified",
+    risk: label(attempt.riskLevel),
+  }));
+  return <RecordsPage
+    eyebrow="Monitoring"
+    title="Login activity"
+    description="Authentication outcomes processed from collector events. Device and network enrichment appears when reported."
+    data={rows}
+    stats={[{ label: "Successful today", value: numbers.format(data.stats.successful) }, { label: "Failed today", value: numbers.format(data.stats.failed) }, { label: "Success rate", value: `${(data.stats.successRate * 100).toFixed(1)}%` }, { label: "High risk", value: numbers.format(data.stats.highRisk) }]}
+    searchPlaceholder="Search login activity…"
+    filterOptions={[...new Set(rows.map((row) => row.site))]}
+    filterKey="site"
+    columns={[{ key: "time", label: "Time", kind: "mono" }, { key: "site", label: "Site", kind: "primary" }, { key: "user", label: "User" }, { key: "result", label: "Result", kind: "status" }, { key: "device", label: "Device" }, { key: "reason", label: "Reason" }, { key: "risk", label: "Risk", kind: "risk" }]}
+  />;
+}

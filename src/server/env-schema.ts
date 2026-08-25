@@ -11,6 +11,12 @@ export const serverEnvSchema = z.object({
   TRUSTED_ORIGINS: z.string().optional(),
   APP_NAME: z.string().min(1).default("Aegis Control"),
   ALLOW_ADMIN_SIGNUP: z.enum(["true", "false"]).default("false").transform((value) => value === "true"),
+  COLLECTOR_RATE_LIMIT_PER_MINUTE: z.coerce.number().int().min(10).max(100_000).default(120),
+  COLLECTOR_SINGLE_MAX_BYTES: z.coerce.number().int().min(1_024).max(1_000_000).default(65_536),
+  COLLECTOR_BATCH_MAX_BYTES: z.coerce.number().int().min(8_192).max(5_000_000).default(524_288),
+  COLLECTOR_TRUSTED_PROXIES: z.string().default(""),
+  COLLECTOR_PROXY_SECRET: z.string().optional(),
+  GEOIP_IPINFO_TOKEN: z.string().optional(),
 }).superRefine((env, context) => {
   if (env.NODE_ENV !== "production") return;
   if (!env.BETTER_AUTH_URL.startsWith("https://")) {
@@ -22,6 +28,9 @@ export const serverEnvSchema = z.object({
   }
   if (env.ALLOW_ADMIN_SIGNUP) {
     context.addIssue({ code: "custom", path: ["ALLOW_ADMIN_SIGNUP"], message: "Admin signup must be disabled in production" });
+  }
+  if (!env.COLLECTOR_PROXY_SECRET || env.COLLECTOR_PROXY_SECRET.length < 32) {
+    context.addIssue({ code: "custom", path: ["COLLECTOR_PROXY_SECRET"], message: "COLLECTOR_PROXY_SECRET must contain at least 32 characters in production" });
   }
 });
 

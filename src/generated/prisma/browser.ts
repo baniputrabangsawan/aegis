@@ -63,6 +63,11 @@ export type Site = Prisma.SiteModel
  */
 export type SiteApiCredential = Prisma.SiteApiCredentialModel
 /**
+ * Model CollectorRateLimit
+ * 
+ */
+export type CollectorRateLimit = Prisma.CollectorRateLimitModel
+/**
  * Model ExternalUser
  * 
  */

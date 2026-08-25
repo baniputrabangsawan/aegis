@@ -231,6 +231,7 @@ export type SiteApiCredentialWhereInput = {
   expiresAt?: Prisma.DateTimeNullableFilter<"SiteApiCredential"> | Date | string | null
   revokedAt?: Prisma.DateTimeNullableFilter<"SiteApiCredential"> | Date | string | null
   site?: Prisma.XOR<Prisma.SiteScalarRelationFilter, Prisma.SiteWhereInput>
+  rateLimits?: Prisma.CollectorRateLimitListRelationFilter
 }
 
 export type SiteApiCredentialOrderByWithRelationInput = {
@@ -246,6 +247,7 @@ export type SiteApiCredentialOrderByWithRelationInput = {
   expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   revokedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   site?: Prisma.SiteOrderByWithRelationInput
+  rateLimits?: Prisma.CollectorRateLimitOrderByRelationAggregateInput
 }
 
 export type SiteApiCredentialWhereUniqueInput = Prisma.AtLeast<{
@@ -265,6 +267,7 @@ export type SiteApiCredentialWhereUniqueInput = Prisma.AtLeast<{
   expiresAt?: Prisma.DateTimeNullableFilter<"SiteApiCredential"> | Date | string | null
   revokedAt?: Prisma.DateTimeNullableFilter<"SiteApiCredential"> | Date | string | null
   site?: Prisma.XOR<Prisma.SiteScalarRelationFilter, Prisma.SiteWhereInput>
+  rateLimits?: Prisma.CollectorRateLimitListRelationFilter
 }, "id" | "organizationId_keyPrefix" | "secretHash">
 
 export type SiteApiCredentialOrderByWithAggregationInput = {
@@ -312,6 +315,7 @@ export type SiteApiCredentialCreateInput = {
   expiresAt?: Date | string | null
   revokedAt?: Date | string | null
   site: Prisma.SiteCreateNestedOneWithoutCredentialsInput
+  rateLimits?: Prisma.CollectorRateLimitCreateNestedManyWithoutCredentialInput
 }
 
 export type SiteApiCredentialUncheckedCreateInput = {
@@ -326,6 +330,7 @@ export type SiteApiCredentialUncheckedCreateInput = {
   lastUsedAt?: Date | string | null
   expiresAt?: Date | string | null
   revokedAt?: Date | string | null
+  rateLimits?: Prisma.CollectorRateLimitUncheckedCreateNestedManyWithoutCredentialInput
 }
 
 export type SiteApiCredentialUpdateInput = {
@@ -339,6 +344,7 @@ export type SiteApiCredentialUpdateInput = {
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   site?: Prisma.SiteUpdateOneRequiredWithoutCredentialsNestedInput
+  rateLimits?: Prisma.CollectorRateLimitUpdateManyWithoutCredentialNestedInput
 }
 
 export type SiteApiCredentialUncheckedUpdateInput = {
@@ -353,6 +359,7 @@ export type SiteApiCredentialUncheckedUpdateInput = {
   lastUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  rateLimits?: Prisma.CollectorRateLimitUncheckedUpdateManyWithoutCredentialNestedInput
 }
 
 export type SiteApiCredentialCreateManyInput = {
@@ -452,6 +459,11 @@ export type SiteApiCredentialMinOrderByAggregateInput = {
   revokedAt?: Prisma.SortOrder
 }
 
+export type SiteApiCredentialScalarRelationFilter = {
+  is?: Prisma.SiteApiCredentialWhereInput
+  isNot?: Prisma.SiteApiCredentialWhereInput
+}
+
 export type SiteApiCredentialCreateNestedManyWithoutSiteInput = {
   create?: Prisma.XOR<Prisma.SiteApiCredentialCreateWithoutSiteInput, Prisma.SiteApiCredentialUncheckedCreateWithoutSiteInput> | Prisma.SiteApiCredentialCreateWithoutSiteInput[] | Prisma.SiteApiCredentialUncheckedCreateWithoutSiteInput[]
   connectOrCreate?: Prisma.SiteApiCredentialCreateOrConnectWithoutSiteInput | Prisma.SiteApiCredentialCreateOrConnectWithoutSiteInput[]
@@ -494,6 +506,20 @@ export type SiteApiCredentialUncheckedUpdateManyWithoutSiteNestedInput = {
   deleteMany?: Prisma.SiteApiCredentialScalarWhereInput | Prisma.SiteApiCredentialScalarWhereInput[]
 }
 
+export type SiteApiCredentialCreateNestedOneWithoutRateLimitsInput = {
+  create?: Prisma.XOR<Prisma.SiteApiCredentialCreateWithoutRateLimitsInput, Prisma.SiteApiCredentialUncheckedCreateWithoutRateLimitsInput>
+  connectOrCreate?: Prisma.SiteApiCredentialCreateOrConnectWithoutRateLimitsInput
+  connect?: Prisma.SiteApiCredentialWhereUniqueInput
+}
+
+export type SiteApiCredentialUpdateOneRequiredWithoutRateLimitsNestedInput = {
+  create?: Prisma.XOR<Prisma.SiteApiCredentialCreateWithoutRateLimitsInput, Prisma.SiteApiCredentialUncheckedCreateWithoutRateLimitsInput>
+  connectOrCreate?: Prisma.SiteApiCredentialCreateOrConnectWithoutRateLimitsInput
+  upsert?: Prisma.SiteApiCredentialUpsertWithoutRateLimitsInput
+  connect?: Prisma.SiteApiCredentialWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SiteApiCredentialUpdateToOneWithWhereWithoutRateLimitsInput, Prisma.SiteApiCredentialUpdateWithoutRateLimitsInput>, Prisma.SiteApiCredentialUncheckedUpdateWithoutRateLimitsInput>
+}
+
 export type SiteApiCredentialCreateWithoutSiteInput = {
   id?: string
   name: string
@@ -504,6 +530,7 @@ export type SiteApiCredentialCreateWithoutSiteInput = {
   lastUsedAt?: Date | string | null
   expiresAt?: Date | string | null
   revokedAt?: Date | string | null
+  rateLimits?: Prisma.CollectorRateLimitCreateNestedManyWithoutCredentialInput
 }
 
 export type SiteApiCredentialUncheckedCreateWithoutSiteInput = {
@@ -516,6 +543,7 @@ export type SiteApiCredentialUncheckedCreateWithoutSiteInput = {
   lastUsedAt?: Date | string | null
   expiresAt?: Date | string | null
   revokedAt?: Date | string | null
+  rateLimits?: Prisma.CollectorRateLimitUncheckedCreateNestedManyWithoutCredentialInput
 }
 
 export type SiteApiCredentialCreateOrConnectWithoutSiteInput = {
@@ -561,6 +589,76 @@ export type SiteApiCredentialScalarWhereInput = {
   revokedAt?: Prisma.DateTimeNullableFilter<"SiteApiCredential"> | Date | string | null
 }
 
+export type SiteApiCredentialCreateWithoutRateLimitsInput = {
+  id?: string
+  name: string
+  keyPrefix: string
+  secretHash: string
+  environment: $Enums.SiteEnvironment
+  createdAt?: Date | string
+  lastUsedAt?: Date | string | null
+  expiresAt?: Date | string | null
+  revokedAt?: Date | string | null
+  site: Prisma.SiteCreateNestedOneWithoutCredentialsInput
+}
+
+export type SiteApiCredentialUncheckedCreateWithoutRateLimitsInput = {
+  id?: string
+  organizationId: string
+  siteId: string
+  name: string
+  keyPrefix: string
+  secretHash: string
+  environment: $Enums.SiteEnvironment
+  createdAt?: Date | string
+  lastUsedAt?: Date | string | null
+  expiresAt?: Date | string | null
+  revokedAt?: Date | string | null
+}
+
+export type SiteApiCredentialCreateOrConnectWithoutRateLimitsInput = {
+  where: Prisma.SiteApiCredentialWhereUniqueInput
+  create: Prisma.XOR<Prisma.SiteApiCredentialCreateWithoutRateLimitsInput, Prisma.SiteApiCredentialUncheckedCreateWithoutRateLimitsInput>
+}
+
+export type SiteApiCredentialUpsertWithoutRateLimitsInput = {
+  update: Prisma.XOR<Prisma.SiteApiCredentialUpdateWithoutRateLimitsInput, Prisma.SiteApiCredentialUncheckedUpdateWithoutRateLimitsInput>
+  create: Prisma.XOR<Prisma.SiteApiCredentialCreateWithoutRateLimitsInput, Prisma.SiteApiCredentialUncheckedCreateWithoutRateLimitsInput>
+  where?: Prisma.SiteApiCredentialWhereInput
+}
+
+export type SiteApiCredentialUpdateToOneWithWhereWithoutRateLimitsInput = {
+  where?: Prisma.SiteApiCredentialWhereInput
+  data: Prisma.XOR<Prisma.SiteApiCredentialUpdateWithoutRateLimitsInput, Prisma.SiteApiCredentialUncheckedUpdateWithoutRateLimitsInput>
+}
+
+export type SiteApiCredentialUpdateWithoutRateLimitsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  keyPrefix?: Prisma.StringFieldUpdateOperationsInput | string
+  secretHash?: Prisma.StringFieldUpdateOperationsInput | string
+  environment?: Prisma.EnumSiteEnvironmentFieldUpdateOperationsInput | $Enums.SiteEnvironment
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  site?: Prisma.SiteUpdateOneRequiredWithoutCredentialsNestedInput
+}
+
+export type SiteApiCredentialUncheckedUpdateWithoutRateLimitsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  siteId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  keyPrefix?: Prisma.StringFieldUpdateOperationsInput | string
+  secretHash?: Prisma.StringFieldUpdateOperationsInput | string
+  environment?: Prisma.EnumSiteEnvironmentFieldUpdateOperationsInput | $Enums.SiteEnvironment
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
 export type SiteApiCredentialCreateManySiteInput = {
   id?: string
   name: string
@@ -583,6 +681,7 @@ export type SiteApiCredentialUpdateWithoutSiteInput = {
   lastUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  rateLimits?: Prisma.CollectorRateLimitUpdateManyWithoutCredentialNestedInput
 }
 
 export type SiteApiCredentialUncheckedUpdateWithoutSiteInput = {
@@ -595,6 +694,7 @@ export type SiteApiCredentialUncheckedUpdateWithoutSiteInput = {
   lastUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  rateLimits?: Prisma.CollectorRateLimitUncheckedUpdateManyWithoutCredentialNestedInput
 }
 
 export type SiteApiCredentialUncheckedUpdateManyWithoutSiteInput = {
@@ -610,6 +710,35 @@ export type SiteApiCredentialUncheckedUpdateManyWithoutSiteInput = {
 }
 
 
+/**
+ * Count Type SiteApiCredentialCountOutputType
+ */
+
+export type SiteApiCredentialCountOutputType = {
+  rateLimits: number
+}
+
+export type SiteApiCredentialCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  rateLimits?: boolean | SiteApiCredentialCountOutputTypeCountRateLimitsArgs
+}
+
+/**
+ * SiteApiCredentialCountOutputType without action
+ */
+export type SiteApiCredentialCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SiteApiCredentialCountOutputType
+   */
+  select?: Prisma.SiteApiCredentialCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * SiteApiCredentialCountOutputType without action
+ */
+export type SiteApiCredentialCountOutputTypeCountRateLimitsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CollectorRateLimitWhereInput
+}
+
 
 export type SiteApiCredentialSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -624,6 +753,8 @@ export type SiteApiCredentialSelect<ExtArgs extends runtime.Types.Extensions.Int
   expiresAt?: boolean
   revokedAt?: boolean
   site?: boolean | Prisma.SiteDefaultArgs<ExtArgs>
+  rateLimits?: boolean | Prisma.SiteApiCredential$rateLimitsArgs<ExtArgs>
+  _count?: boolean | Prisma.SiteApiCredentialCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["siteApiCredential"]>
 
 export type SiteApiCredentialSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -673,6 +804,8 @@ export type SiteApiCredentialSelectScalar = {
 export type SiteApiCredentialOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "siteId" | "name" | "keyPrefix" | "secretHash" | "environment" | "createdAt" | "lastUsedAt" | "expiresAt" | "revokedAt", ExtArgs["result"]["siteApiCredential"]>
 export type SiteApiCredentialInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   site?: boolean | Prisma.SiteDefaultArgs<ExtArgs>
+  rateLimits?: boolean | Prisma.SiteApiCredential$rateLimitsArgs<ExtArgs>
+  _count?: boolean | Prisma.SiteApiCredentialCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type SiteApiCredentialIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   site?: boolean | Prisma.SiteDefaultArgs<ExtArgs>
@@ -685,6 +818,7 @@ export type $SiteApiCredentialPayload<ExtArgs extends runtime.Types.Extensions.I
   name: "SiteApiCredential"
   objects: {
     site: Prisma.$SitePayload<ExtArgs>
+    rateLimits: Prisma.$CollectorRateLimitPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1093,6 +1227,7 @@ readonly fields: SiteApiCredentialFieldRefs;
 export interface Prisma__SiteApiCredentialClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   site<T extends Prisma.SiteDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SiteDefaultArgs<ExtArgs>>): Prisma.Prisma__SiteClient<runtime.Types.Result.GetResult<Prisma.$SitePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  rateLimits<T extends Prisma.SiteApiCredential$rateLimitsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SiteApiCredential$rateLimitsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CollectorRateLimitPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1531,6 +1666,30 @@ export type SiteApiCredentialDeleteManyArgs<ExtArgs extends runtime.Types.Extens
    * Limit how many SiteApiCredentials to delete.
    */
   limit?: number
+}
+
+/**
+ * SiteApiCredential.rateLimits
+ */
+export type SiteApiCredential$rateLimitsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CollectorRateLimit
+   */
+  select?: Prisma.CollectorRateLimitSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CollectorRateLimit
+   */
+  omit?: Prisma.CollectorRateLimitOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CollectorRateLimitInclude<ExtArgs> | null
+  where?: Prisma.CollectorRateLimitWhereInput
+  orderBy?: Prisma.CollectorRateLimitOrderByWithRelationInput | Prisma.CollectorRateLimitOrderByWithRelationInput[]
+  cursor?: Prisma.CollectorRateLimitWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CollectorRateLimitScalarFieldEnum | Prisma.CollectorRateLimitScalarFieldEnum[]
 }
 
 /**

@@ -191,6 +191,13 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 .definition:nth-child(odd) { border-right: 1px solid var(--line); }
 .definition dt { color: var(--ink-tertiary); font-size: 10px; font-weight: 650; letter-spacing: .05em; text-transform: uppercase; }
 .definition dd { margin: 5px 0 0; color: var(--ink); font-size: 12px; font-weight: 540; }
+.session-detail-stack { display: grid; align-content: start; gap: 16px; }
+.session-compact-list { grid-template-columns: 1fr; }
+.session-compact-list .definition { border-right: 0; }
+.session-user-agent { margin: 16px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.session-empty { display: grid; place-items: center; }
+.session-event-badges { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
+.session-event-item { grid-template-columns: 130px 30px minmax(0, 1fr) auto; }
 .docs-topbar { position: sticky; padding: 0 max(20px, calc((100vw - 1280px) / 2)); background: rgb(255 255 255 / 90%); }
 .docs-layout { max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: 220px minmax(0, 720px) 1fr; gap: 48px; padding: 42px 24px; }
 .docs-note { position: sticky; top: 90px; }
@@ -217,6 +224,9 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 .danger-icon { color: var(--danger); }
 .mobile-key-actions { display: flex; gap: 8px; margin-top: 14px; }
 .table-empty { height: 120px !important; color: var(--ink-tertiary) !important; text-align: center !important; }
+.table-link { color: var(--accent-strong); font-weight: 640; text-decoration: none; }
+.table-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+.table-link:focus-visible { border-radius: 3px; outline: 2px solid var(--accent); outline-offset: 3px; }
 .auth-footnote { margin: 20px 0 0; color: var(--ink-tertiary); font-size: 10px; text-align: center; }
 .spin { animation: spin .8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -272,6 +282,9 @@ button:disabled { cursor: not-allowed; opacity: .55; }
   .aside-note { order: -1; }
   .event-item { grid-template-columns: 44px 28px minmax(0, 1fr); padding: 12px; gap: 8px; }
   .event-item > .badge { grid-column: 3; justify-self: start; }
+  .session-event-item { grid-template-columns: 28px minmax(0, 1fr); }
+  .session-event-item .event-time { grid-column: 1 / -1; }
+  .session-event-item .session-event-badges { grid-column: 2; justify-content: flex-start; }
   .definition-list { grid-template-columns: 1fr; }
   .definition:nth-child(odd) { border-right: 0; }
   .docs-layout { grid-template-columns: 1fr; gap: 24px; padding: 28px 18px; }

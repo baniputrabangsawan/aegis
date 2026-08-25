@@ -239,6 +239,7 @@ model SiteApiCredential {
   expiresAt      DateTime?
   revokedAt      DateTime?
   site           Site            @relation(fields: [organizationId, siteId], references: [organizationId, id], onDelete: Cascade)
+  rateLimits     CollectorRateLimit[]
 
   @@unique([organizationId, keyPrefix])
   @@unique([secretHash])
@@ -246,6 +247,18 @@ model SiteApiCredential {
   @@index([siteId, revokedAt])
   @@index([createdAt])
   @@map("site_api_credentials")
+}
+
+model CollectorRateLimit {
+  credentialId String
+  windowStart  DateTime
+  count        Int               @default(0)
+  expiresAt    DateTime
+  credential  SiteApiCredential @relation(fields: [credentialId], references: [id], onDelete: Cascade)
+
+  @@id([credentialId, windowStart])
+  @@index([expiresAt])
+  @@map("collector_rate_limits")
 }
 
 model ExternalUser {

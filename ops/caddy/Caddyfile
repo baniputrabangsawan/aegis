@@ -5,7 +5,10 @@
 
 {$DASHBOARD_DOMAIN} {
 	encode zstd gzip
-	reverse_proxy app:3000
+	reverse_proxy app:3000 {
+		header_up X-Real-IP {remote_host}
+		header_up X-Aegis-Proxy-Secret {$COLLECTOR_PROXY_SECRET}
+	}
 	log {
 		output stdout
 		format json

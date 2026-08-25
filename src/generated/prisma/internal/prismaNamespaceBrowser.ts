@@ -60,6 +60,7 @@ export const ModelName = {
   Invitation: 'Invitation',
   Site: 'Site',
   SiteApiCredential: 'SiteApiCredential',
+  CollectorRateLimit: 'CollectorRateLimit',
   ExternalUser: 'ExternalUser',
   SiteSession: 'SiteSession',
   Device: 'Device',
@@ -217,6 +218,16 @@ export const SiteApiCredentialScalarFieldEnum = {
 } as const
 
 export type SiteApiCredentialScalarFieldEnum = (typeof SiteApiCredentialScalarFieldEnum)[keyof typeof SiteApiCredentialScalarFieldEnum]
+
+
+export const CollectorRateLimitScalarFieldEnum = {
+  credentialId: 'credentialId',
+  windowStart: 'windowStart',
+  count: 'count',
+  expiresAt: 'expiresAt'
+} as const
+
+export type CollectorRateLimitScalarFieldEnum = (typeof CollectorRateLimitScalarFieldEnum)[keyof typeof CollectorRateLimitScalarFieldEnum]
 
 
 export const ExternalUserScalarFieldEnum = {

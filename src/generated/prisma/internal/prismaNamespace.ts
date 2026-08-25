@@ -406,6 +406,7 @@ export const ModelName = {
   Invitation: 'Invitation',
   Site: 'Site',
   SiteApiCredential: 'SiteApiCredential',
+  CollectorRateLimit: 'CollectorRateLimit',
   ExternalUser: 'ExternalUser',
   SiteSession: 'SiteSession',
   Device: 'Device',
@@ -428,7 +429,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "account" | "verification" | "organization" | "member" | "invitation" | "site" | "siteApiCredential" | "externalUser" | "siteSession" | "device" | "loginAttempt" | "securityEvent" | "blockedIP" | "auditLog"
+    modelProps: "user" | "session" | "account" | "verification" | "organization" | "member" | "invitation" | "site" | "siteApiCredential" | "collectorRateLimit" | "externalUser" | "siteSession" | "device" | "loginAttempt" | "securityEvent" | "blockedIP" | "auditLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1095,6 +1096,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.SiteApiCredentialCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.SiteApiCredentialCountAggregateOutputType> | number
+        }
+      }
+    }
+    CollectorRateLimit: {
+      payload: Prisma.$CollectorRateLimitPayload<ExtArgs>
+      fields: Prisma.CollectorRateLimitFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CollectorRateLimitFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CollectorRateLimitPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CollectorRateLimitFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CollectorRateLimitPayload>
+        }
+        findFirst: {
+          args: Prisma.CollectorRateLimitFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CollectorRateLimitPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CollectorRateLimitFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CollectorRateLimitPayload>
+        }
+        findMany: {
+          args: Prisma.CollectorRateLimitFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CollectorRateLimitPayload>[]
+        }
+        create: {
+          args: Prisma.CollectorRateLimitCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CollectorRateLimitPayload>
+        }
+        createMany: {
+          args: Prisma.CollectorRateLimitCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CollectorRateLimitCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CollectorRateLimitPayload>[]
+        }
+        delete: {
+          args: Prisma.CollectorRateLimitDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CollectorRateLimitPayload>
+        }
+        update: {
+          args: Prisma.CollectorRateLimitUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CollectorRateLimitPayload>
+        }
+        deleteMany: {
+          args: Prisma.CollectorRateLimitDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CollectorRateLimitUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CollectorRateLimitUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CollectorRateLimitPayload>[]
+        }
+        upsert: {
+          args: Prisma.CollectorRateLimitUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CollectorRateLimitPayload>
+        }
+        aggregate: {
+          args: Prisma.CollectorRateLimitAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCollectorRateLimit>
+        }
+        groupBy: {
+          args: Prisma.CollectorRateLimitGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CollectorRateLimitGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CollectorRateLimitCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CollectorRateLimitCountAggregateOutputType> | number
         }
       }
     }
@@ -1789,6 +1864,16 @@ export const SiteApiCredentialScalarFieldEnum = {
 export type SiteApiCredentialScalarFieldEnum = (typeof SiteApiCredentialScalarFieldEnum)[keyof typeof SiteApiCredentialScalarFieldEnum]
 
 
+export const CollectorRateLimitScalarFieldEnum = {
+  credentialId: 'credentialId',
+  windowStart: 'windowStart',
+  count: 'count',
+  expiresAt: 'expiresAt'
+} as const
+
+export type CollectorRateLimitScalarFieldEnum = (typeof CollectorRateLimitScalarFieldEnum)[keyof typeof CollectorRateLimitScalarFieldEnum]
+
+
 export const ExternalUserScalarFieldEnum = {
   id: 'id',
   organizationId: 'organizationId',
@@ -2370,6 +2455,7 @@ export type GlobalOmitConfig = {
   invitation?: Prisma.InvitationOmit
   site?: Prisma.SiteOmit
   siteApiCredential?: Prisma.SiteApiCredentialOmit
+  collectorRateLimit?: Prisma.CollectorRateLimitOmit
   externalUser?: Prisma.ExternalUserOmit
   siteSession?: Prisma.SiteSessionOmit
   device?: Prisma.DeviceOmit

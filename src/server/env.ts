@@ -1,7 +1,7 @@
 import "server-only";
 import { serverEnvSchema, type ParsedServerEnv } from "@/server/env-schema";
 
-export type ServerEnv = ParsedServerEnv & { trustedOrigins: string[] };
+export type ServerEnv = ParsedServerEnv & { trustedOrigins: string[]; collectorTrustedProxies: string[] };
 
 let cachedEnv: ServerEnv | undefined;
 
@@ -16,7 +16,8 @@ export function getServerEnv(): ServerEnv {
     .split(",")
     .map((origin) => origin.trim())
     .filter(Boolean);
-  cachedEnv = { ...parsed.data, trustedOrigins };
+  const collectorTrustedProxies = parsed.data.COLLECTOR_TRUSTED_PROXIES.split(",").map((proxy) => proxy.trim()).filter(Boolean);
+  cachedEnv = { ...parsed.data, trustedOrigins, collectorTrustedProxies };
   return cachedEnv;
 }
 

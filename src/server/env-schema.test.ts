@@ -8,6 +8,7 @@ const validEnvironment = {
   BETTER_AUTH_URL: "https://security.example.com",
   TRUSTED_ORIGINS: "https://security.example.com",
   ALLOW_ADMIN_SIGNUP: "false",
+  COLLECTOR_PROXY_SECRET: "a-proxy-secret-that-is-also-long-enough",
 };
 
 describe("production environment policy", () => {
@@ -33,6 +34,11 @@ describe("production environment policy", () => {
 
   it("rejects an excessive database pool", () => {
     const parsed = serverEnvSchema.safeParse({ ...validEnvironment, DB_POOL_MAX: "101" });
+    expect(parsed.success).toBe(false);
+  });
+
+  it("requires a strong reverse-proxy secret in production", () => {
+    const parsed = serverEnvSchema.safeParse({ ...validEnvironment, COLLECTOR_PROXY_SECRET: "short" });
     expect(parsed.success).toBe(false);
   });
 });

@@ -41,6 +41,7 @@
     "recharts": "latest",
     "server-only": "^0.0.1",
     "tailwind-merge": "latest",
+    "ua-parser-js": "^2.0.10",
     "zod": "^4.4.3"
   },
   "devDependencies": {
