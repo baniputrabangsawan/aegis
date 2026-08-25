@@ -12,6 +12,9 @@ function startOfToday(now: Date) {
 
 const nonTerminal = ["ACTIVE", "IDLE", "INACTIVE"] as const;
 const elevatedRisks = ["HIGH", "CRITICAL"] as const;
+const adminActionTerms = ["organization.", "member.", "invitation.", "site.", "api_key.", "settings.", "admin."];
+const securityActionTerms = ["security.", "security_event.", "blocked_ip.", "session.revoke", "investigation."];
+const policyActionTerms = ["policy.", "settings.", "blocked_ip.", "api_key.", "create", "update", "delete", "revoke", "rotate"];
 
 export function effectiveSessionStatus(session: { status: string; lastActiveAt: Date; expiresAt: Date | null }, now = new Date()) {
   if (["EXPIRED", "REVOKED", "LOGGED_OUT"].includes(session.status)) return session.status;
@@ -142,6 +145,25 @@ export async function getBlockedIpsMonitoring(actor: TenantActor, now = new Date
     prisma.blockedIP.count({ where: { ...where, status: "ACTIVE", expiresAt: { gte: now, lt: tomorrow } } }),
   ]);
   return { rows, stats: { active, global, siteScoped, expiringToday } };
+}
+
+function actionContains(terms: readonly string[]): Prisma.AuditLogWhereInput {
+  return { OR: terms.map((term) => ({ action: { contains: term } })) };
+}
+
+export async function getAuditLogsMonitoring(actor: TenantActor, now = new Date()) {
+  const prisma = getPrisma();
+  const today = startOfToday(now);
+  const where: Prisma.AuditLogWhereInput = { organizationId: actor.organizationId };
+  const todayWhere: Prisma.AuditLogWhereInput = { ...where, createdAt: { gte: today } };
+  const [rows, eventsToday, adminActions, securityActions, policyChanges] = await Promise.all([
+    prisma.auditLog.findMany({ where, orderBy: { createdAt: "desc" }, take: 250, select: { id: true, action: true, targetType: true, targetId: true, metadata: true, actorIp: true, createdAt: true, site: { select: { name: true } }, actor: { select: { name: true, email: true } } } }),
+    prisma.auditLog.count({ where: todayWhere }),
+    prisma.auditLog.count({ where: { ...todayWhere, ...actionContains(adminActionTerms) } }),
+    prisma.auditLog.count({ where: { ...todayWhere, ...actionContains(securityActionTerms) } }),
+    prisma.auditLog.count({ where: { ...todayWhere, ...actionContains(policyActionTerms) } }),
+  ]);
+  return { rows, stats: { eventsToday, adminActions, securityActions, policyChanges } };
 }
 
 export async function getLiveMonitoring(actor: TenantActor, now = new Date()) {
