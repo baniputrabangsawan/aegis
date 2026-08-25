@@ -36,7 +36,7 @@ const sections = [
 function Navigation({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
   return <>
-    <div className="sidebar-brand"><span className="brand-mark"><Shield size={17} strokeWidth={2.4} /></span><span><div className="brand-name">Aegis Control</div><div className="brand-caption">Global security ops</div></span></div>
+    <div className="sidebar-brand"><span className="brand-mark"><Shield size={17} strokeWidth={2.4} /></span><span><div className="brand-name">Aegis</div><div className="brand-caption">Security control plane</div></span></div>
     <nav className="nav-body" aria-label="Primary navigation">{sections.map((section) => <div className="nav-section" key={section.label || "settings"}>{section.label && <div className="nav-label">{section.label}</div>}{section.links.map(({ href, label, icon: Icon }) => {
       const active = href === "/dashboard" ? pathname === href : pathname.startsWith(href);
       return <Link href={href} onClick={onNavigate} className={cn("nav-link", active && "active")} key={href}><Icon size={15} strokeWidth={1.8} /><span>{label}</span></Link>;
@@ -51,7 +51,8 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     <div className="app-main">
       <header className="topbar">
         <Dialog.Root><Dialog.Trigger asChild><button className="icon-button mobile-menu" aria-label="Open navigation"><Menu size={18} /></button></Dialog.Trigger><Dialog.Portal><Dialog.Overlay className="drawer-overlay" /><Dialog.Content className="mobile-drawer" aria-describedby={undefined}><Dialog.Title className="sr-only">Navigation</Dialog.Title><Dialog.Close className="icon-button sheet-close" aria-label="Close navigation"><X size={18} /></Dialog.Close><Navigation onNavigate={() => undefined} /></Dialog.Content></Dialog.Portal></Dialog.Root>
-        <label className="command-search"><Search size={15} /><input type="search" placeholder="Search sites, users, IPs…" aria-label="Global search" /><span className="keycap">⌘K</span></label>
+        <div className="topbar-context"><span className="topbar-product">Control center</span><span className="topbar-divider" /><span className="topbar-workspace">Nusantara Cloud</span></div>
+        <label className="command-search"><Search size={15} /><input type="search" placeholder="Search resources…" aria-label="Global search" /><span className="keycap">⌘K</span></label>
         <div className="topbar-spacer" />
         <span className="live-indicator"><span className="live-dot" />All systems operational</span>
         <button className="icon-button" aria-label="Notifications"><Bell size={17} /><span className="sr-only">3 unread alerts</span></button>

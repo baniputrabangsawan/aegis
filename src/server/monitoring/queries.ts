@@ -210,13 +210,15 @@ export async function getOverviewMonitoring(actor: TenantActor, now = new Date()
   };
   const loginChart = Array.from({ length: 8 }, (_, index) => {
     const hour = new Date(now.getTime() - (7 - index) * 3 * 60 * 60_000);
-    return { time: hour.toLocaleTimeString("en", { hour: "2-digit", minute: "2-digit", hour12: false }), success: 0, failed: 0 };
+    return { time: hour.toISOString(), success: 0, failed: 0 };
   });
   for (const login of hourlyLogins) {
     const index = Math.min(7, Math.max(0, Math.floor((login.occurredAt.getTime() - dayAgo.getTime()) / (3 * 60 * 60_000))));
     if (login.success) loginChart[index].success += 1; else loginChart[index].failed += 1;
   }
+  const totalLogins = successful + failed;
   return {
+    successRate: totalLogins === 0 ? 0 : successful / totalLogins,
     metrics: [
       { label: "Sites", value: String(siteCount), trend: `${activeSites} active`, note: "connected collectors", icon: "sites" },
       { label: "Users", value: String(users), trend: "Live", note: "external identities", icon: "users" },
